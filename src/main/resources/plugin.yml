@@ -1,0 +1,4 @@
+name: MCGems
+version: '${version}'
+main: me.bscal.mcgems.MCGems
+api-version: 1.19
