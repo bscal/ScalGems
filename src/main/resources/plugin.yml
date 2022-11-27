@@ -2,3 +2,5 @@ name: MCGems
 version: '${version}'
 main: me.bscal.mcgems.MCGems
 api-version: 1.19
+libraries:
+  - "net.axay:kspigot:1.19.0"

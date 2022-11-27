@@ -1,7 +1,6 @@
 package me.bscal.mcgems
 
 import org.bukkit.entity.Player
-import java.util.UUID
 
 class GemPlayer(player: Player)
 {
@@ -15,7 +14,8 @@ class GemPlayer(player: Player)
     {
         for (equipment in this.Player.equipment.armorContents)
         {
-            val gemSet = DeserializeItemStack(equipment);
+            if (equipment == null) continue;
+            val gemSet = DeserializeGemItemStack(equipment);
             gemSet?.Equip(this)
         }
     }
