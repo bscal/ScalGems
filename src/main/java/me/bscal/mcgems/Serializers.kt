@@ -18,7 +18,8 @@ import org.bukkit.Color
 @Serializer(forClass = GemStat::class)
 object GemStatToString : KSerializer<GemStat>
 {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("GemStat", PrimitiveKind.STRING);
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(
+            "GemStat", PrimitiveKind.STRING);
 
     override fun serialize(encoder: Encoder, value: GemStat)
     {
@@ -28,7 +29,8 @@ object GemStatToString : KSerializer<GemStat>
     override fun deserialize(decoder: Decoder): GemStat
     {
         val value = decoder.decodeString();
-        val gemStat: GemStat = NameToGemStatMap[value] ?: error("GemStat $value is not registered to McGems");
+        val gemStat: GemStat = NameToGemStatMap[value]
+                ?: error("GemStat $value is not registered to McGems");
         return gemStat;
     }
 }
@@ -38,7 +40,8 @@ object GemStatToString : KSerializer<GemStat>
 object BukkitColorToMapSerializer : KSerializer<Color>
 {
     private val delegateSerializer = MapSerializer(String.serializer(), Int.serializer());
-    override val descriptor: SerialDescriptor = SerialDescriptor("Color", delegateSerializer.descriptor);
+    override val descriptor: SerialDescriptor = SerialDescriptor(
+            "Color", delegateSerializer.descriptor);
 
     override fun serialize(encoder: Encoder, value: Color)
     {
@@ -58,7 +61,8 @@ object BukkitColorToMapSerializer : KSerializer<Color>
 object BukkitColorArrayToMapSerializer : KSerializer<Array<Color>>
 {
     private val delegateSerializer = ArraySerializer(BukkitColorToMapSerializer);
-    override val descriptor: SerialDescriptor = SerialDescriptor("ColorArray", delegateSerializer.descriptor);
+    override val descriptor: SerialDescriptor = SerialDescriptor(
+            "ColorArray", delegateSerializer.descriptor);
 
     override fun serialize(encoder: Encoder, value: Array<Color>)
     {
@@ -66,7 +70,8 @@ object BukkitColorArrayToMapSerializer : KSerializer<Array<Color>>
         c.encodeIntElement(descriptor, 0, value.size);
         for (i in value.indices)
         {
-            c.encodeSerializableElement(descriptor, i + 1, BukkitColorToMapSerializer, value[i]);
+            c.encodeSerializableElement(descriptor, i + 1,
+                    BukkitColorToMapSerializer, value[i]);
         }
         c.endStructure(descriptor);
     }
@@ -77,7 +82,8 @@ object BukkitColorArrayToMapSerializer : KSerializer<Array<Color>>
         {
             val result: Array<Color> = Array(this.decodeIntElement(descriptor, 0))
             {
-                this.decodeSerializableElement(descriptor, it + 1, BukkitColorToMapSerializer)
+                this.decodeSerializableElement(descriptor, it + 1,
+                        BukkitColorToMapSerializer)
             }
             result;
         }

@@ -1,11 +1,10 @@
 package me.bscal.mcgems
 
-import com.google.common.collect.Maps
 import org.bukkit.entity.Player
 import java.util.UUID
 
 // Maybe implement some caching?
-val GemPlayerMap = Maps.newHashMap<UUID, GemPlayer>();
+val GemPlayerMap: HashMap<UUID, GemPlayer> = HashMap();
 
 fun CreateGemPlayer(player: Player): GemPlayer
 {

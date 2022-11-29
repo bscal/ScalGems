@@ -4,7 +4,6 @@ import com.mojang.brigadier.context.CommandContext
 import net.axay.kspigot.commands.command
 import net.axay.kspigot.commands.literal
 import net.minecraft.commands.CommandSourceStack
-import org.bukkit.Bukkit
 import org.bukkit.Color
 import org.bukkit.Material
 import org.bukkit.persistence.PersistentDataType
@@ -35,7 +34,7 @@ fun AddSocketCommand(ctx: CommandContext<CommandSourceStack>): Int
     if (handStack.type == Material.AIR) return 0;
 
     val gemItemStack = CreateGemItemStack(Array(1) {
-        Color.GRAY
+        Color.WHITE
     }, null);
     gemItemStack.Serialize(handStack);
 
@@ -44,6 +43,26 @@ fun AddSocketCommand(ctx: CommandContext<CommandSourceStack>): Int
     println(gemGearSetJson)
 
     player.bukkitEntity.sendMessage("Successfully added a socket to your item!");
+    return 1;
+}
+
+fun SocketGUICommand(ctx: CommandContext<CommandSourceStack>): Int
+{
+    val player = ctx.source.player ?: return 0;
+    val bukkitPlayer = player.bukkitEntity;
+    val gemPlayer = GemPlayerMap[bukkitPlayer.uniqueId] ?: return 0;
+    val handStack = bukkitPlayer.equipment.itemInMainHand;
+    if (handStack.type == Material.AIR) return 0;
+    val handGemGearSet = DeserializeGemItemStack(handStack) ?: return 0;
+
+    try
+    {
+        CreateGemSmithUi(bukkitPlayer, gemPlayer, handStack, handGemGearSet);
+    } catch (e: Exception)
+    {
+        e.printStackTrace()
+    }
+
     return 1;
 }
 
@@ -120,6 +139,14 @@ fun InitCommands()
         literal("debug") {
             executes {
                 DebugItemCommand(it);
+            }
+        }
+    }
+
+    command("MCGems") {
+        literal("gui") {
+            executes {
+                SocketGUICommand(it);
             }
         }
     }

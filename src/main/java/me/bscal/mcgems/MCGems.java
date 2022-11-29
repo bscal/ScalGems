@@ -33,6 +33,7 @@ public final class MCGems extends KSpigot implements Listener
     {
         Bukkit.getPluginManager().registerEvents(this, this);
         CommandsKt.InitCommands();
+        GemKt.InitGemColors();
     }
 
     @Override
