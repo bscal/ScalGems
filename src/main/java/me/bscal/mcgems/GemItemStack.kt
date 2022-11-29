@@ -23,9 +23,8 @@ class GemItemStack
     var SocketBonus: GemStat? = null;
     var IsBonusActive: Boolean = false;
 
-    fun Socket(player: Player, slot: Int, gem: Gem, gemItemStack: ItemStack): Boolean
+    fun Socket(player: Player, gemPlayer: GemPlayer, slot: Int, gem: Gem, gemItemStack: ItemStack): Boolean
     {
-        println(GemArray.size);
         if (slot >= GemArray.size) return false;
 
         if (gem.Color != ColorArray[slot])
@@ -54,6 +53,9 @@ class GemItemStack
         }
 
         Serialize(gemItemStack);
+
+        Unequip(gemPlayer);
+        Equip(gemPlayer);
 
         return true;
     }

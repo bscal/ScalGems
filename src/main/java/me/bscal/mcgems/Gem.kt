@@ -4,15 +4,13 @@ package me.bscal.mcgems
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import net.axay.kspigot.chat.KColors
-import net.axay.kspigot.extensions.bukkit.textColor
-import net.axay.kspigot.items.addLore
-import net.axay.kspigot.items.itemStack
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Color
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.persistence.PersistentDataType
 
 @Serializable
@@ -22,6 +20,7 @@ data class Gem(val Name: String,
 
 val GemNameKey = NamespacedKey(MCGems.Instance, "GemNameKey");
 
+val NameList: ArrayList<String> = ArrayList();
 val NameToGemMap: HashMap<String, Gem> = HashMap(32, .5f);
 val NameToGemStatMap: HashMap<String, GemStat> = HashMap(32, .5f);
 val NameToGemStackMap: HashMap<String, GemStack> = HashMap(32, .5f)
@@ -60,6 +59,7 @@ fun RegisterGem(name: String, color: Color, stat: GemStat,
     NameToGemMap[gem.Name] = gem;
     NameToGemStackMap[gem.Name] = gemStack;
     UiItemStacks.add(gemStack.DefaultStack);
+    NameList.add(gem.Name);
     return gem;
 }
 
@@ -73,8 +73,19 @@ fun GemFromItemStack(itemStack: ItemStack): Gem?
 {
     if (!itemStack.hasItemMeta()) return null;
     val gemName = itemStack.itemMeta
-            .persistentDataContainer[GemNameKey, PersistentDataType.STRING] ?: return null;
+            .persistentDataContainer[GemNameKey, PersistentDataType.STRING]
+            ?: return null;
     return NameToGemMap[gemName];
+}
+
+fun GemAddToItemMeta(gem: Gem, itemMeta: ItemMeta)
+{
+    itemMeta.persistentDataContainer.set(GemNameKey, PersistentDataType.STRING, gem.Name);
+}
+
+fun ColorToTextColor(color: Color): TextColor
+{
+    return TextColor.color(color.red, color.green, color.blue)
 }
 
 data class GemStat(
@@ -86,6 +97,8 @@ data class GemStat(
 
 private var NextModelIds: Int = 10000
 
+val STAT_COLOR = TextColor.color(0, 255, 0);
+
 class GemStack(displayName: String, material: Material, gem: Gem)
 {
     val ModelId: Int;
@@ -94,17 +107,21 @@ class GemStack(displayName: String, material: Material, gem: Gem)
     init
     {
         ModelId = NextModelIds++;
-        DefaultStack = itemStack(material)
-        {
-            editMeta {
-                val name = Component.text(displayName, gem.Color.textColor);
-                it.displayName(name)
-                it.addLore {
-                    val lore = Component.text(gem.Stat.LoreStr, KColors.LIGHTGREEN);
-                    this.lorelist.add(lore);
-                }
-                it.setCustomModelData(ModelId);
-            }
-        }
+        DefaultStack = ItemStack(material)
+
+        val im = DefaultStack.itemMeta;
+        val name = Component.text(displayName, ColorToTextColor(gem.Color));
+        im.displayName(name);
+
+        val lore = ArrayList<Component>(1)
+        val lineStat = Component.text(gem.Stat.LoreStr, STAT_COLOR);
+        lore.add(lineStat);
+        im.lore(lore)
+
+        im.setCustomModelData(ModelId);
+
+        GemAddToItemMeta(gem, im);
+
+        DefaultStack.itemMeta = im;
     }
 }
